@@ -61,6 +61,11 @@ python main.py test path/to/images/folder/
 ```
 where ```"path/to/images/folder/"``` is the path of a folder containing the images for which you want to calculate the saliency maps.
 
+**Note** that to process a folder containing a large number of images you should use the following command:
+```
+python main.py large_test path/to/folder/with/many/images/
+```
+
 To train our model from scratch:
 ```
 python main.py train

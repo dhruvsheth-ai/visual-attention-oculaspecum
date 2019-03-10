@@ -6,7 +6,7 @@ from keras.models import Model
 import os, cv2, sys
 import numpy as np
 from config import *
-from utilities import preprocess_images, preprocess_maps, preprocess_fixmaps, postprocess_predictions
+from utilities import preprocess_images, preprocess_maps, preprocess_fixmaps, postprocess_predictions, break_directory_into_pieces
 from models import sam_vgg, sam_resnet, kl_divergence, correlation_coefficient, nss
 
 
@@ -115,5 +115,11 @@ if __name__ == '__main__':
                 original_image = cv2.imread(imgs_test_path + name, 0)
                 res = postprocess_predictions(pred[0], original_image.shape[0], original_image.shape[1])
                 cv2.imwrite(output_folder + '%s' % name, res.astype(int))
+
+        elif phase == 'large_test':
+            subdir_every_n_images = 32
+            large_test_path =  sys.argv[2]
+            break_directory_into_pieces(large_test_path, subdir_every_n_images)
+
         else:
             raise NotImplementedError

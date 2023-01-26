@@ -56,12 +56,21 @@ Note: Be sure to have ```"image_dim_ordering": "th"``` and ```"backend": "theano
 ## Usage
 We built two different versions of our model: one based on the VGG-16 (**SAM-VGG**) and the other based on the ResNet-50 (**SAM-ResNet**). It is possible use both versions of SAM by changing the ```version``` variable in the [config.py](config.py) file (set ```version = 0``` for SAM-VGG or ```version = 1``` for SAM-ResNet).
 
+### Testing the model (Generating Saliency Maps)
+
+#### For small number of samples (Usually smaller than 32 depending on the memory)
 To compute saliency maps using our pre-trained model:
 ```
 python main.py test path/to/images/folder/
 ```
 where ```"path/to/images/folder/"``` is the path of a folder containing the images for which you want to calculate the saliency maps.
 
+#### For large number of samples
+**Note** that to process a folder containing a large number of images you should use the following command:
+```
+python main.py large_test path/to/folder/with/many/images/
+```
+### Training from Scratch
 To train our model from scratch:
 ```
 python main.py train

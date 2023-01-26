@@ -1,5 +1,6 @@
 from __future__ import division
 import cv2
+import os
 import numpy as np
 import scipy.io
 import scipy.ndimage
@@ -129,3 +130,42 @@ def postprocess_predictions(pred, shape_r, shape_c):
     img = img / np.max(img) * 255
 
     return img
+
+def break_directory_into_pieces(path_to_break, every_n_images): 
+    
+    def process_image_batch(batch_no, images_to_process):
+
+        # inc batch count
+        batch_no += 1
+
+        # make a folder
+        cmd_make_folder = "mkdir " + path_to_break + '/batch_' + str(batch_count)
+        os.system(cmd_make_folder)
+
+        # cp all queued images to the folder
+        for cp_name in images_to_process:
+            cp_cmd = "mv " + path_to_break + '/' + cp_name + " " + path_to_break + '/batch_' + str(batch_count)
+            os.system(cp_cmd)
+        
+        print("Processed batch no. {}".format(batch_count))
+
+        return batch_no
+
+
+    image_list = os.listdir(path_to_break)
+    batch_count = 0
+    cp_list = []   
+
+    for idx, image_name in enumerate(image_list):
+        # put to queue
+        cp_list.append(image_name)
+
+        if ((idx + 1) % every_n_images) == 0:
+            batch_count = process_image_batch(batch_count, cp_list)
+
+            # free memory
+            cp_list = []
+
+    # check if list is empty or not
+    if len(cp_list) != 0:
+        batch_count = process_image_batch(batch_count, cp_list)

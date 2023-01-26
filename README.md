@@ -2,8 +2,8 @@
 
 This repository contains the reference code for computing SAM (Saliency Attentive Model) saliency maps based on the following paper:
 
-_Marcella Cornia, Lorenzo Baraldi, Giuseppe Serra, Rita Cucchiara_  
-_Predicting Human Eye Fixations via an LSTM-based Saliency Attentive Model_  
+_Marcella Cornia, Lorenzo Baraldi, Giuseppe Serra, Rita Cucchiara_
+_Predicting Human Eye Fixations via an LSTM-based Saliency Attentive Model_
 _IEEE Transactions on Image Processing, 2018_
 
 Please cite with the following Bibtex code:
@@ -24,8 +24,8 @@ The PDF of the article is available at this [link](http://aimagelab.ing.unimore.
 
 Additional experimental results are reported in the following short paper:
 
-_Marcella Cornia, Lorenzo Baraldi, Giuseppe Serra, Rita Cucchiara_  
-_SAM: Pushing the Limits of Saliency Prediction Models_  
+_Marcella Cornia, Lorenzo Baraldi, Giuseppe Serra, Rita Cucchiara_
+_SAM: Pushing the Limits of Saliency Prediction Models_
 _Proceedings of the IEEE/CVF International Conference on Computer Vision and Pattern Recognition Workshops, 2018_
 
 Please cite with the following Bibtex code:

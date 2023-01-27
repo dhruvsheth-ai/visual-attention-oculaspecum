@@ -9,7 +9,12 @@ from config import *
 from utilities import preprocess_images, preprocess_maps, preprocess_fixmaps, postprocess_predictions, break_directory_into_pieces
 from models import sam_vgg, sam_resnet, kl_divergence, correlation_coefficient, nss
 import theano.ifelse
-
+import scipy
+import scipy.ndimage as ndimage
+import scipy.ndimage.filters as filters
+import csv
+import math
+import re
 
 def generator(b_s, phase_gen='train'):
     if phase_gen == 'train':
@@ -47,6 +52,10 @@ def generator_test(b_s, imgs_test_path):
     while True:
         yield [preprocess_images(images[counter:counter + b_s], shape_r, shape_c), gaussian]
         counter = (counter + b_s) % len(images)
+
+
+
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
@@ -115,7 +124,61 @@ if __name__ == '__main__':
             for pred, name in zip(predictions, file_names):
                 original_image = cv2.imread(imgs_test_path + name, 0)
                 res = postprocess_predictions(pred[0], original_image.shape[0], original_image.shape[1])
+                fname = res.astype(int)
+                neighborhood_size = 10
+                threshold = 10
+                data = fname
+                data_max = filters.maximum_filter(data, neighborhood_size)
+                maxima = (data == data_max)
+                data_min = filters.minimum_filter(data, neighborhood_size)
+                diff = ((data_max - data_min) > threshold)
+                maxima = np.logical_and(maxima, diff)
+
+                counter2 = 0
+                labeled, num_objects = ndimage.label(maxima)
+                slices = ndimage.find_objects(labeled)
+                x, y, intensity = [], [], []
+                weights = []                
+                
+                def open_csv(name3):
+                    with open('/content/Akumars_csv_headgaze_beforeduplicating_07_12_csv.csv', 'r') as another_csv:
+                        reader = csv.reader(another_csv)
+                        for row in reader:
+                            if reader.line_num == 15909 + name3: # 1 less than the image counting should start at
+                                
+                                EyeX = float(row[5])
+                                EyeY = float(row[6])
+                                print(EyeX, EyeY)
+                                break
+                    return EyeX, EyeY
+
+
+                counter2 +=1
+
+                with open('/content/saliency_data.csv', 'a', newline='') as new_csv:
+                    new_writer = csv.writer(new_csv, delimiter=',')
+                    for dy, dx in slices:
+                        name2 = re.sub("\D","",name)
+                        name3 = int(name2) - 16581
+                        open_csv(name3)     
+                        EyeX, EyeY = open_csv(name3)                         
+                       
+                        x_center = (dx.start + dx.stop - 1)/2
+                        y_center = (dy.start + dy.stop - 1)/2
+                        weight = data[int(y_center), int(x_center)]
+                        weights.append(weight)
+                        
+                        # Calculate the weighted distance
+                        distance = math.sqrt((x_center - EyeX)**2 + (y_center - EyeY)**2)
+                        weighted_distance = (weight / distance)*100
+
+                        # Write the coordinates and weighted distance of the current maxima point to new.csv
+                        new_writer.writerow([x_center, y_center, weight, distance, weighted_distance, name2, EyeX, EyeY]) 
+                        print(x_center, y_center, weight, distance, weighted_distance, name2, EyeX, EyeY)
                 cv2.imwrite(output_folder + '%s' % name, res.astype(int))
+                #plt.imshow(data)
+                #plt.autoscale(False)
+                #plt.plot(x,y, 'ro')                
 
         elif phase == 'large_test':
             subdir_every_n_images = 32

@@ -35,33 +35,29 @@ from utilities import preprocess_maps
 def generator(b_s, phase_gen="train"):
     if phase_gen == "train":
         images = [
-            imgs_train_path + f
-            for f in os.listdir(imgs_train_path)
+            imgs_train_path + f for f in os.listdir(imgs_train_path)
             if f.endswith((".jpg", ".jpeg", ".png"))
         ]
         maps = [
-            maps_train_path + f
-            for f in os.listdir(maps_train_path)
+            maps_train_path + f for f in os.listdir(maps_train_path)
             if f.endswith((".jpg", ".jpeg", ".png"))
         ]
         fixs = [
-            fixs_train_path + f
-            for f in os.listdir(fixs_train_path)
+            fixs_train_path + f for f in os.listdir(fixs_train_path)
             if f.endswith(".mat")
         ]
     elif phase_gen == "val":
         images = [
-            imgs_val_path + f
-            for f in os.listdir(imgs_val_path)
+            imgs_val_path + f for f in os.listdir(imgs_val_path)
             if f.endswith((".jpg", ".jpeg", ".png"))
         ]
         maps = [
-            maps_val_path + f
-            for f in os.listdir(maps_val_path)
+            maps_val_path + f for f in os.listdir(maps_val_path)
             if f.endswith((".jpg", ".jpeg", ".png"))
         ]
         fixs = [
-            fixs_val_path + f for f in os.listdir(fixs_val_path) if f.endswith(".mat")
+            fixs_val_path + f for f in os.listdir(fixs_val_path)
+            if f.endswith(".mat")
         ]
     else:
         raise NotImplementedError
@@ -74,12 +70,12 @@ def generator(b_s, phase_gen="train"):
 
     counter = 0
     while True:
-        Y = preprocess_maps(maps[counter : counter + b_s], shape_r_out, shape_c_out)
-        Y_fix = preprocess_fixmaps(
-            fixs[counter : counter + b_s], shape_r_out, shape_c_out
-        )
+        Y = preprocess_maps(maps[counter:counter + b_s], shape_r_out,
+                            shape_c_out)
+        Y_fix = preprocess_fixmaps(fixs[counter:counter + b_s], shape_r_out,
+                                   shape_c_out)
         yield [
-            preprocess_images(images[counter : counter + b_s], shape_r, shape_c),
+            preprocess_images(images[counter:counter + b_s], shape_r, shape_c),
             gaussian,
         ], [Y, Y, Y_fix]
         counter = (counter + b_s) % len(images)
@@ -87,8 +83,7 @@ def generator(b_s, phase_gen="train"):
 
 def generator_test(b_s, imgs_test_path):
     images = [
-        imgs_test_path + f
-        for f in os.listdir(imgs_test_path)
+        imgs_test_path + f for f in os.listdir(imgs_test_path)
         if f.endswith((".jpg", ".jpeg", ".png"))
     ]
     images.sort()
@@ -98,7 +93,7 @@ def generator_test(b_s, imgs_test_path):
     counter = 0
     while True:
         yield [
-            preprocess_images(images[counter : counter + b_s], shape_r, shape_c),
+            preprocess_images(images[counter:counter + b_s], shape_r, shape_c),
             gaussian,
         ]
         counter = (counter + b_s) % len(images)
@@ -115,15 +110,13 @@ if __name__ == "__main__":
         if version == 0:
             m = Model(input=[x, x_maps], output=sam_vgg([x, x_maps]))
             print("Compiling SAM-VGG")
-            m.compile(
-                RMSprop(lr=1e-4), loss=[kl_divergence, correlation_coefficient, nss]
-            )
+            m.compile(RMSprop(lr=1e-4),
+                      loss=[kl_divergence, correlation_coefficient, nss])
         elif version == 1:
             m = Model(input=[x, x_maps], output=sam_resnet([x, x_maps]))
             print("Compiling SAM-ResNet")
-            m.compile(
-                RMSprop(lr=1e-4), loss=[kl_divergence, correlation_coefficient, nss]
-            )
+            m.compile(RMSprop(lr=1e-4),
+                      loss=[kl_divergence, correlation_coefficient, nss])
         else:
             raise NotImplementedError
 
@@ -176,8 +169,7 @@ if __name__ == "__main__":
             imgs_test_path = sys.argv[2]
 
             file_names = [
-                f
-                for f in os.listdir(imgs_test_path)
+                f for f in os.listdir(imgs_test_path)
                 if f.endswith((".jpg", ".jpeg", ".png"))
             ]
             file_names.sort()
@@ -198,14 +190,13 @@ if __name__ == "__main__":
 
             print("Predicting saliency maps for " + imgs_test_path)
             predictions = m.predict_generator(
-                generator_test(b_s=b_s, imgs_test_path=imgs_test_path), nb_imgs_test
-            )[0]
+                generator_test(b_s=b_s, imgs_test_path=imgs_test_path),
+                nb_imgs_test)[0]
 
             for pred, name in zip(predictions, file_names):
                 original_image = cv2.imread(imgs_test_path + name, 0)
-                res = postprocess_predictions(
-                    pred[0], original_image.shape[0], original_image.shape[1]
-                )
+                res = postprocess_predictions(pred[0], original_image.shape[0],
+                                              original_image.shape[1])
                 fname = res.astype(int)
                 neighborhood_size = 10
                 threshold = 10
@@ -224,13 +215,13 @@ if __name__ == "__main__":
 
                 def open_csv(name3):
                     with open(
-                        "/content/Akumars_csv_headgaze_beforeduplicating_07_12_csv.csv",
-                        "r",
+                            "/content/Akumars_csv_headgaze_beforeduplicating_07_12_csv.csv",
+                            "r",
                     ) as another_csv:
                         reader = csv.reader(another_csv)
                         for row in reader:
                             if (
-                                reader.line_num == 15909 + name3
+                                    reader.line_num == 15909 + name3
                             ):  # 1 less than the image counting should start at
 
                                 EyeX = float(row[5])
@@ -241,7 +232,8 @@ if __name__ == "__main__":
 
                 counter2 += 1
 
-                with open("/content/saliency_data.csv", "a", newline="") as new_csv:
+                with open("/content/saliency_data.csv", "a",
+                          newline="") as new_csv:
                     new_writer = csv.writer(new_csv, delimiter=",")
                     for dy, dx in slices:
                         name2 = re.sub("\D", "", name)
@@ -255,24 +247,21 @@ if __name__ == "__main__":
                         weights.append(weight)
 
                         # Calculate the weighted distance
-                        distance = math.sqrt(
-                            (x_center - EyeX) ** 2 + (y_center - EyeY) ** 2
-                        )
+                        distance = math.sqrt((x_center - EyeX)**2 +
+                                             (y_center - EyeY)**2)
                         weighted_distance = (weight / distance) * 100
 
                         # Write the coordinates and weighted distance of the current maxima point to new.csv
-                        new_writer.writerow(
-                            [
-                                x_center,
-                                y_center,
-                                weight,
-                                distance,
-                                weighted_distance,
-                                name2,
-                                EyeX,
-                                EyeY,
-                            ]
-                        )
+                        new_writer.writerow([
+                            x_center,
+                            y_center,
+                            weight,
+                            distance,
+                            weighted_distance,
+                            name2,
+                            EyeX,
+                            EyeY,
+                        ])
                         print(
                             x_center,
                             y_center,

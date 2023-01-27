@@ -1,28 +1,28 @@
 from __future__ import division
-from keras.optimizers import RMSprop
-from keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
-from keras.layers import Input
-from keras.models import Model
+
+import csv
+import math
 import os
-import cv2
+import re
 import sys
+
+import cv2
 import numpy as np
-from config import *
-from utilities import (
-    preprocess_images,
-    preprocess_maps,
-    preprocess_fixmaps,
-    postprocess_predictions,
-    break_directory_into_pieces,
-)
-from models import sam_vgg, sam_resnet, kl_divergence, correlation_coefficient, nss
-import theano.ifelse
 import scipy
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
-import csv
-import math
-import re
+import theano.ifelse
+from keras.callbacks import (EarlyStopping, LearningRateScheduler,
+                             ModelCheckpoint)
+from keras.layers import Input
+from keras.models import Model
+from keras.optimizers import RMSprop
+
+from config import *
+from models import (correlation_coefficient, kl_divergence, nss, sam_resnet,
+                    sam_vgg)
+from utilities import (break_directory_into_pieces, postprocess_predictions,
+                       preprocess_fixmaps, preprocess_images, preprocess_maps)
 
 
 def generator(b_s, phase_gen="train"):

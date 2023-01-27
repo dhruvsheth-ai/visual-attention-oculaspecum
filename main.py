@@ -12,17 +12,24 @@ import scipy
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 import theano.ifelse
-from keras.callbacks import (EarlyStopping, LearningRateScheduler,
-                             ModelCheckpoint)
+from keras.callbacks import EarlyStopping
+from keras.callbacks import LearningRateScheduler
+from keras.callbacks import ModelCheckpoint
 from keras.layers import Input
 from keras.models import Model
 from keras.optimizers import RMSprop
 
 from config import *
-from models import (correlation_coefficient, kl_divergence, nss, sam_resnet,
-                    sam_vgg)
-from utilities import (break_directory_into_pieces, postprocess_predictions,
-                       preprocess_fixmaps, preprocess_images, preprocess_maps)
+from models import correlation_coefficient
+from models import kl_divergence
+from models import nss
+from models import sam_resnet
+from models import sam_vgg
+from utilities import break_directory_into_pieces
+from utilities import postprocess_predictions
+from utilities import preprocess_fixmaps
+from utilities import preprocess_images
+from utilities import preprocess_maps
 
 
 def generator(b_s, phase_gen="train"):
